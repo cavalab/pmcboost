@@ -9,7 +9,10 @@ from sklearn.metrics import roc_auc_score, average_precision_score
 from pmlb import pmlb   
 import ipdb
 import utils
-dataset = pmlb.fetch_data('adult', local_cache_dir='/home/bill/projects/pmlb'
+import metrics
+
+dataset = pmlb.fetch_data('adult', 
+                          local_cache_dir='/home/bill/projects/pmlb'
 )
 X = dataset.drop('target',axis=1)
 y = dataset['target']
@@ -31,16 +34,18 @@ groups = ['race','sex','native-country']
 
 est = LogisticRegression().fit(Xtrain,ytrain)
 
+grouping = 'marginal'
+
 print(f'y balance: {y.sum()/len(y)}')
 MC_params = dict(
     estimator = est,
-    auditor_type = Auditor(groups=groups),
+    auditor_type = Auditor(groups=groups,grouping=grouping),
     eta = 0.3,
     gamma=0.1,
     alpha=0.1,
     rho=0.2,
     max_iters=1000,
-    verbosity=1,
+    verbosity=2,
     n_bins=7,
     # iter_sample='bootstrap'
 )
@@ -67,25 +72,30 @@ for model,name in [(est,'base'), (MC,'MC'), (PMC,'PMC')]:
         for metric in [roc_auc_score, average_precision_score]: 
             # print(f'{metric.__name__}: {metric(y_true, y_pred):.3f}')
             print(f'{metric(y_true, y_pred):.3f}',end='\t')
-        mc = utils.MC_loss(y_true, y_pred, 
-                           proportional=False,
-                           X=x, 
-                           groups=groups,
-                           alpha=MC_params['alpha'], 
-                           gamma=MC_params['gamma'],
-                           bins=bins,
-                           rho=MC_params['rho']
-                          )
-        pmc = utils.MC_loss(y_true, y_pred, 
-                           proportional=True,
-                           X=x, 
-                           groups=groups,
-                           alpha=MC_params['alpha'], 
-                           gamma=MC_params['gamma'],
-                           # n_bins=MC_params['n_bins'],
-                           bins=bins,
-                           rho=MC_params['rho']
-                          )
+        mc = metrics.multicalibration_loss(
+            model,
+            x, 
+            y_true, 
+            groups,
+            grouping=grouping,
+            alpha=MC_params['alpha'], 
+            gamma=MC_params['gamma'],
+            bins=bins,
+            rho=MC_params['rho']
+        )
+        pmc = metrics.proportional_multicalibration_loss(
+            model,
+            x, 
+            y_true, 
+            groups,
+            grouping=grouping,
+            proportional=True,
+            alpha=MC_params['alpha'], 
+            gamma=MC_params['gamma'],
+            # n_bins=MC_params['n_bins'],
+            bins=bins,
+            rho=MC_params['rho']
+        )
         # if name == 'PMC':
         #     assert pmc == model.auditor_.loss(y_true, y_pred, x)
         # elif name == 'MC':

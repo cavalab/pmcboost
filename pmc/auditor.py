@@ -4,7 +4,9 @@ import ipdb
 import logging
 logger = logging.getLogger(__name__)
 
-def categorize_fn(X, y, groups,
+def marginals(x):
+    ipdb.set_trace()
+def categorize_fn(X, y, groups, grouping,
                n_bins=10,
                bins=None,
                alpha=0.01,
@@ -29,7 +31,18 @@ def categorize_fn(X, y, groups,
                                            retbins=True
                                           )
     categories = {}
-    for group, i in df.groupby(groups).groups.items():
+    if grouping=='intersectional':
+        group_ids = df.groupby(groups).groups
+    elif grouping=='marginal':
+        group_ids = df[groups].groupby(groups).groups
+        group_ids = {}
+        for g in groups:
+            grp = df.groupby(g).groups
+            for k,v in grp.items():
+                group_ids[(g,k)] = v
+
+    # ipdb.set_trace()
+    for group, i in group_ids.items():
         # filter groups smaller than gamma*len(X)
         if len(i)/len(X) <= gamma:
             continue
@@ -50,6 +63,9 @@ class Auditor():
     groups: list of str, default: None
         Specify a list of sensitive attributes to use as groups, instead of
         using an estimator. 
+    grouping: 'marginal' or 'intersectional'
+        how to handle groups. marginal will group by the individual features,
+        whereas intersectional considers all intersections for grouping.
     metric: 'MC' or 'PMC', default: PMC
     alpha: float, default: 0.01
         tolerance for calibration error per group. 
@@ -72,6 +88,7 @@ class Auditor():
     def __init__(self, 
                  estimator=None,
                  groups=None,
+                 grouping='intersectional',
                  alpha=0.01,
                  n_bins=10,
                  bins=None,
@@ -79,7 +96,7 @@ class Auditor():
                  rho=0.1,
                  metric=None,
                  random_state=0,
-                 verbosity=0
+                 verbosity=0,
                 ):
         self.estimator=estimator
         self.groups = groups
@@ -91,15 +108,17 @@ class Auditor():
         self.metric=metric
         self.random_state=random_state
         self.verbosity=verbosity
+        self.grouping=grouping
 
     def categorize(self, X, y):
         """Map data to an existing set of categories."""
 
         # return categories
-        return categorize_fn(X, y, self.groups, 
+        return categorize_fn(X, y, self.groups, self.grouping,
                           bins=self.bins_,
                           alpha=self.alpha,
-                          gamma=self.gamma
+                          gamma=self.gamma,
+                          
                          )
 
 

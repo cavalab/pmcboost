@@ -1,12 +1,11 @@
 import ipdb
 import numpy as np
 import pandas as pd
-from .params import groups as GROUPS
 from tqdm import tqdm
 import logging
 import itertools as it
 logger = logging.getLogger(__name__)
-from .auditor import categorize_fn 
+from auditor import categorize_fn 
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
@@ -58,7 +57,8 @@ def multicalibration_loss(
     estimator,
     X,
     y_true,
-    groups=GROUPS,
+    groups,
+    grouping='intersectional',
     n_bins=None,
     bins=None,
     categories=None,
@@ -83,7 +83,7 @@ def multicalibration_loss(
     assert groups is not None, "groups must be defined."
 
     if categories is None:
-        categories = categorize_fn(X, y_pred, groups,
+        categories = categorize_fn(X, y_pred, groups, grouping,
                                 n_bins=n_bins,
                                 bins=bins,
                                 alpha=alpha, 
@@ -103,20 +103,20 @@ def multicalibration_loss(
 
     return loss
 
-def multicalibration_score(estimator, X, y_true, **kwargs):
-    return -multicalibation_loss(estimator, X, y_true, **kwargs)
+def multicalibration_score(estimator, X, y_true, groups, **kwargs):
+    return -multicalibation_loss(estimator, X, y_true,groups, **kwargs)
 
-def proportional_multicalibration_loss(estimator, X, y_true, **kwargs):
+def proportional_multicalibration_loss(estimator, X, y_true, groups, **kwargs):
     kwargs['proportional'] = True
-    return multicalibration_loss(estimator, X, y_true, **kwargs)
+    return multicalibration_loss(estimator, X, y_true, groups,  **kwargs)
 def proportional_multicalibration_score(estimator, X, y_true, **kwargs):
-    return -proportional_multicalibration_loss(estimator, X, y_true, **kwargs)
+    return -proportional_multicalibration_loss(estimator, X, y_true, groups,  **kwargs)
 
 def differential_calibration(
     estimator, 
     X, 
     y_true,
-    groups=GROUPS,
+    groups,
     n_bins=None,
     bins=None,
     stratified_categories=None,

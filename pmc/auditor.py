@@ -4,8 +4,6 @@ import ipdb
 import logging
 logger = logging.getLogger(__name__)
 
-def marginals(x):
-    ipdb.set_trace()
 def categorize_fn(X, y, groups, grouping,
                n_bins=10,
                bins=None,

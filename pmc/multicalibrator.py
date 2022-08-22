@@ -15,12 +15,8 @@ from sklearn.utils import resample
 from sklearn.metrics import mean_squared_error as mse
 from sklearn.metrics import r2_score
 from copy import copy
-# from utils import squash_array, squash_series
-import utils #as utils
+import pmc.utils as utils
 import logging
-# logging.basicConfig(format='%(message)s',
-#                     datefmt='%m/%d/%Y %I:%M:%S %p',
-#                    )
 logger = logging.getLogger(__name__)
 
 class MultiCalibrator(ClassifierMixin, BaseEstimator):

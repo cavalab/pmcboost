@@ -5,7 +5,7 @@ from tqdm import tqdm
 import logging
 import itertools as it
 logger = logging.getLogger(__name__)
-from auditor import categorize_fn 
+from pmc.auditor import categorize_fn 
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."

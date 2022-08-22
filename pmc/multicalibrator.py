@@ -17,6 +17,8 @@ from sklearn.metrics import r2_score
 from copy import copy
 import pmc.utils as utils
 import logging
+from pmc.metrics import (multicalibration_score,
+                     proportional_multicalibration_score)
 logger = logging.getLogger(__name__)
 
 class MultiCalibrator(ClassifierMixin, BaseEstimator):
@@ -409,5 +411,21 @@ class MultiCalibrator(ClassifierMixin, BaseEstimator):
 
     def score(self, X, y):
         """Return auditor score"""
-        y_pred = self.predict_proba(X)[:,1]
-        return self.auditor_.loss(y, y_pred, X)[0]
+        # y_pred = self.predict_proba(X)[:,1]
+        # return self.auditor_.loss(y, y_pred, X)[0]
+        fn_params = dict(
+            estimator=self,
+            X=X,
+            y=y,
+            groups = self.auditor_.groups,
+            grouping=self.auditor_.grouping,
+            bins=self.auditor_.bins_,
+            alpha=self.alpha,
+            gamma=self.gamma,
+            rho=self.rho
+        )
+
+        if self.metric== 'MC':
+            return multicalibration_score(**fn_params)
+        else:
+            return proportional_multicalibration_score(**fn_params)

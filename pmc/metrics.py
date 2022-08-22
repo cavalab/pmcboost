@@ -83,6 +83,7 @@ def multicalibration_loss(
     assert groups is not None, "groups must be defined."
 
     if categories is None:
+        # categories = estimator.auditor_.categorize(X, y_pred, groups, grouping,
         categories = categorize_fn(X, y_pred, groups, grouping,
                                 n_bins=n_bins,
                                 bins=bins,
@@ -156,22 +157,3 @@ def differential_calibration(
                 dc_max = dc
 
     return dc_max
-
-# def smoothed_empirical_differential_fairness(self, concentration=1.0):
-#     """Smoothed EDF 
-#     References:
-#         .. [#foulds18] J. R. Foulds, R. Islam, K. N. Keya, and S. Pan,
-#            "An Intersectional Definition of Fairness," arXiv preprint
-#            arXiv:1807.08362, 2018.
-#     """
-#     sbr = self._smoothed_base_rates(self.dataset.labels, concentration)
-
-#     def pos_ratio(i, j):
-#         return abs(np.log(sbr[i]) - np.log(sbr[j]))
-
-#     def neg_ratio(i, j):
-#         return abs(np.log(1 - sbr[i]) - np.log(1 - sbr[j]))
-
-#     # overall DF of the mechanism
-#     return max(max(pos_ratio(i, j), neg_ratio(i, j))
-#                for i in range(len(sbr)) for j in range(len(sbr)) if i != j)

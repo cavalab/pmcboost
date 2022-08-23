@@ -414,18 +414,16 @@ class MultiCalibrator(ClassifierMixin, BaseEstimator):
         # y_pred = self.predict_proba(X)[:,1]
         # return self.auditor_.loss(y, y_pred, X)[0]
         fn_params = dict(
-            estimator=self,
-            X=X,
-            y=y,
-            groups = self.auditor_.groups,
             grouping=self.auditor_.grouping,
             bins=self.auditor_.bins_,
             alpha=self.alpha,
             gamma=self.gamma,
             rho=self.rho
         )
+        
+        groups = self.auditor_.groups
 
         if self.metric== 'MC':
-            return multicalibration_score(**fn_params)
+            return multicalibration_score(self,X,y,groups,**fn_params)
         else:
-            return proportional_multicalibration_score(**fn_params)
+            return proportional_multicalibration_score(self,X,y,groups,**fn_params)

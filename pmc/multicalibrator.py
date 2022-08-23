@@ -410,27 +410,32 @@ class MultiCalibrator(ClassifierMixin, BaseEstimator):
         return self.predict_proba(X)[:,1] > 0.5
 
     def score(self, X, y, **kwargs):
-        """Return auditor score"""
-        # # y_pred = self.predict_proba(X)[:,1]
-        # # return self.auditor_.loss(y, y_pred, X)[0]
-        # fn_params = dict(
-            # grouping=self.auditor_.grouping,
-            # bins=self.auditor_.bins_,
-            # alpha=self.alpha,
-            # gamma=self.gamma,
-            # rho=self.rho
-            # alpha=0.0,
-            # gamma=0.0,
-            # rho=0.0
-        # )
-        # fn_params.update(kwargs)
+        """Return auditor score
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            The input samples.
+
+        y : ndarray, shape (n_samples,)
+            The label for each sample is the label of the closest sample
+            seen during fit.
+
+        kwargs: dictionary
+            arguments passed to the scoring function. 
+
+        Returns
+        -------
+        
+        The negative (proportional) multicalibration loss
+        """
        
         if 'groups' in kwargs.keys():
             groups = kwargs['groups']
         else:
             groups = self.auditor_.groups
 
-        if self.metric== 'MC':
+        if self.metric=='MC':
             return multicalibration_score(self,X,y,groups,**kwargs)
         else:
             return proportional_multicalibration_score(self,X,y,groups,**kwargs)

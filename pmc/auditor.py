@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import ipdb
 import logging
 logger = logging.getLogger(__name__)
 
@@ -21,7 +20,6 @@ def categorize_fn(X, y, groups, grouping,
     else:
         n_bins=len(bins)
 
-    min_size = gamma*alpha*len(X)/n_bins
 
     df = X[groups].copy()
     df.loc[:,'interval'], retbins = pd.cut(y, bins, 
@@ -39,15 +37,16 @@ def categorize_fn(X, y, groups, grouping,
             for k,v in grp.items():
                 group_ids[(g,k)] = v
 
-    # ipdb.set_trace()
+    min_grp_size = gamma*len(X) 
+    min_cat_size = min_grp_size*alpha/n_bins
     for group, i in group_ids.items():
         # filter groups smaller than gamma*len(X)
-        if len(i)/len(X) <= gamma:
+        if len(i) <= min_grp_size:
             continue
         for interval, j in df.loc[i].groupby('interval').groups.items():
-            if len(j) > min_size:
+            # filter categories smaller than alpha*gamma*len(X)/n_bins
+            if len(j) > min_cat_size:
                 categories[group + (interval,)] = j
-                # ipdb.set_trace()
     return categories
 
 class Auditor():

@@ -16,8 +16,8 @@ def pairwise(iterable):
 def stratify_groups(X, y, groups,
                n_bins=10,
                bins=None,
-               alpha=0.01,
-               gamma=0.01
+               alpha=0.0,
+               gamma=0.0
               ):
     """Map data to an existing set of groups, stratified by risk interval."""
     assert isinstance(X, pd.DataFrame), "X should be a dataframe"
@@ -29,7 +29,6 @@ def stratify_groups(X, y, groups,
     else:
         n_bins=len(bins)
 
-    min_size = gamma*alpha*len(X)/n_bins
 
     df = X[groups].copy()
     df.loc[:,'interval'], retbins = pd.cut(y, bins, 
@@ -37,6 +36,7 @@ def stratify_groups(X, y, groups,
                                            retbins=True
                                           )
     stratified_categories = {}
+    min_size = gamma*alpha*len(X)/n_bins
     for group, dfg in df.groupby(groups):
         # ipdb.set_trace()
         # filter groups smaller than gamma*len(X)
@@ -63,9 +63,9 @@ def multicalibration_loss(
     bins=None,
     categories=None,
     proportional=False,
-    alpha=0.01,
-    gamma=0.1,
-    rho=0.1
+    alpha=0.0,
+    gamma=0.0,
+    rho=0.0
 ):
     """custom scoring function for multicalibration.
        calculate current loss in terms of (proportional) multicalibration"""
@@ -95,7 +95,6 @@ def multicalibration_loss(
         category_loss = np.abs(y_true.loc[idx].mean() 
                                - y_pred.loc[idx].mean()
                               )
-        # print(c,len(idx),category_loss)
         if proportional: 
             category_loss /= max(y_true.loc[idx].mean(), rho)
 
@@ -121,9 +120,9 @@ def differential_calibration(
     n_bins=None,
     bins=None,
     stratified_categories=None,
-    alpha=0.01,
-    gamma=0.1,
-    rho=0.01
+    alpha=0.0,
+    gamma=0.0,
+    rho=0.0
 ):
     """Return the differential calibration of estimator on groups."""
 

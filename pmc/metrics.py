@@ -59,7 +59,7 @@ def multicalibration_loss(
     y_true,
     groups,
     grouping='intersectional',
-    n_bins=None,
+    n_bins=10,
     bins=None,
     categories=None,
     proportional=False,

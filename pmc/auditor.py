@@ -30,7 +30,6 @@ def categorize_fn(X, y, groups, grouping,
     if grouping=='intersectional':
         group_ids = df.groupby(groups).groups
     elif grouping=='marginal':
-        group_ids = df[groups].groupby(groups).groups
         group_ids = {}
         for g in groups:
             grp = df.groupby(g).groups
@@ -46,7 +45,7 @@ def categorize_fn(X, y, groups, grouping,
         for interval, j in df.loc[i].groupby('interval').groups.items():
             # filter categories smaller than alpha*gamma*len(X)/n_bins
             if len(j) > min_cat_size:
-                categories[group + (interval,)] = j
+                categories[(group,interval)] = j
     return categories
 
 class Auditor():

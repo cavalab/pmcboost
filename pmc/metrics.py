@@ -4,8 +4,9 @@ import pandas as pd
 from tqdm import tqdm
 import logging
 import itertools as it
+from pmc.utils import categorize
+
 logger = logging.getLogger(__name__)
-from pmc.auditor import categorize_fn 
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
@@ -83,8 +84,7 @@ def multicalibration_loss(
     assert groups is not None, "groups must be defined."
 
     if categories is None:
-        # categories = estimator.auditor_.categorize(X, y_pred, groups, grouping,
-        categories = categorize_fn(X, y_pred, groups, grouping,
+        categories = categorize(X, y_pred, groups, grouping,
                                 n_bins=n_bins,
                                 bins=bins,
                                 alpha=alpha, 

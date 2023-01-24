@@ -4,7 +4,6 @@ import logging
 import pmc.metrics.categorize
 logger = logging.getLogger(__name__)
 
-
 class Auditor():
     """A class that determines and manages group membership over which to assess
     multicalibration.

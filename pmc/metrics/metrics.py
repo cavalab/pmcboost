@@ -17,6 +17,7 @@ def pairwise(iterable):
 def stratify_groups(X, y, groups,
                n_bins=10,
                bins=None,
+               bin_scaling='linear',
                alpha=0.0,
                gamma=0.0
               ):
@@ -25,7 +26,10 @@ def stratify_groups(X, y, groups,
 
 
     if bins is None:
-        bins = np.linspace(float(1.0/n_bins), 1.0, n_bins)
+        if bin_scaling == 'log':
+            bins = np.geomspace(float(1.0/n_bins), 1.0, n_bins)
+        else:
+            bins = np.linspace(float(1.0/n_bins), 1.0, n_bins)
         bins[0] = 0.0
     else:
         n_bins=len(bins)

@@ -6,5 +6,5 @@ setup(name='pmcboost',
       author='William La Cava, Elle Lett',
       author_email='williamlacava@gmail.com',
       url='https://github.com/cavalab/pmcboost',
-      packages=['pmc']
+      packages=['pmc','pmc.metrics','pmc.utils']
      )

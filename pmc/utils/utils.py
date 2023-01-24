@@ -37,6 +37,7 @@ def category_diff(cat1, cat2):
 def categorize(X, y, groups, grouping,
                n_bins=10,
                bins=None,
+               bin_scaling='linear',
                alpha=0.01,
                gamma=0.01
               ):
@@ -46,7 +47,10 @@ def categorize(X, y, groups, grouping,
     categories = None 
 
     if bins is None:
-        bins = np.linspace(float(1.0/n_bins), 1.0, n_bins)
+        if bin_scaling == 'log':
+            bins = np.geomspace(float(1.0/n_bins), 1.0, n_bins)
+        else:
+            bins = np.linspace(float(1.0/n_bins), 1.0, n_bins)
         bins[0] = 0.0
     else:
         n_bins=len(bins)

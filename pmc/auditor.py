@@ -44,6 +44,7 @@ class Auditor():
                  alpha=0.01,
                  n_bins=10,
                  bins=None,
+                 bin_spacing='linear',
                  gamma=0.1,
                  rho=0.1,
                  metric=None,
@@ -96,7 +97,11 @@ class Auditor():
 
         if self.bins is None:
             self.n_bins_ = self.n_bins
-            self.bins_ = np.linspace(1/self.n_bins, 1.0, self.n_bins)
+            if self.bin_scaling == 'log':
+                self.bins_ = np.geomspace(1/self.n_bins, 1.0, self.n_bins)
+            else:
+                self.bins_ = np.linspace(1/self.n_bins, 1.0, self.n_bins)
+            
             self.bins_ = np.insert(self.bins_, 0, 0.0)
         else:
             self.bins_ = self.bins

@@ -109,7 +109,8 @@ def multicalibration_score(estimator, X, y_true, groups, **kwargs):
 def proportional_multicalibration_loss(estimator, X, y_true, groups, **kwargs):
     kwargs['proportional'] = True
     return multicalibration_loss(estimator, X, y_true, groups,  **kwargs)
-def proportional_multicalibration_score(estimator, X, y_true, **kwargs):
+
+def proportional_multicalibration_score(estimator, X, y_true, groups, **kwargs):
     return -proportional_multicalibration_loss(estimator, X, y_true, groups,  **kwargs)
 
 def differential_calibration(

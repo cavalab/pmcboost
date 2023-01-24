@@ -37,6 +37,8 @@ class MultiCalibrator(ClassifierMixin, BaseEstimator):
         tolerance for calibration error per group. 
     n_bins: int, default: 10
         used to discretize probabilities. 
+    bin_spacing: str, default: 'linear'
+        how to space the bins; linear or log 
     gamma: float, default: 0.1
         the minimum probability of a group occuring in the data. 
     rho: float, default: 0.1
@@ -62,6 +64,7 @@ class MultiCalibrator(ClassifierMixin, BaseEstimator):
                  metric='PMC',
                  alpha=0.01,
                  n_bins=10,
+                 bin_spacing='standard',
                  gamma=0.01,
                  rho=0.1,
                  eta=1.0,
@@ -76,6 +79,7 @@ class MultiCalibrator(ClassifierMixin, BaseEstimator):
         self.metric=metric
         self.alpha=alpha
         self.n_bins=n_bins
+        self.bin_spacing=bin_spacing
         self.gamma=gamma
         self.rho=rho
         self.eta=eta

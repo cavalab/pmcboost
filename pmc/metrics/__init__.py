@@ -3,5 +3,6 @@ from .metrics import (
     multicalibration_score,
     proportional_multicalibration_loss,
     proportional_multicalibration_score,
-    differential_calibration   
+    differential_calibration,
+    categorize
 )

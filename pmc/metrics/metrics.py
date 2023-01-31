@@ -4,7 +4,7 @@ import pandas as pd
 from tqdm import tqdm
 import logging
 import itertools as it
-from pmc.utils import categorize
+from pmc.utils import categorize, make_bins
 
 logger = logging.getLogger(__name__)
 
@@ -21,16 +21,15 @@ def stratify_groups(X, y, groups,
                alpha=0.0,
                gamma=0.0
               ):
-    """Map data to an existing set of groups, stratified by risk interval."""
+    """Map data to an existing set of groups, stratified by risk interval.
+
+    Returns categories where, for each interval, there is a dict of groups.
+    """
     assert isinstance(X, pd.DataFrame), "X should be a dataframe"
 
 
     if bins is None:
-        if bin_scaling == 'log':
-            bins = np.geomspace(float(1.0/n_bins), 1.0, n_bins)
-        else:
-            bins = np.linspace(float(1.0/n_bins), 1.0, n_bins)
-        bins[0] = 0.0
+        bins = make_bins(n_bins, bin_scaling)
     else:
         n_bins=len(bins)
 
@@ -43,7 +42,6 @@ def stratify_groups(X, y, groups,
     stratified_categories = {}
     min_size = gamma*alpha*len(X)/n_bins
     for group, dfg in df.groupby(groups):
-        # ipdb.set_trace()
         # filter groups smaller than gamma*len(X)
         if len(dfg)/len(X) <= gamma:
             continue
@@ -54,8 +52,7 @@ def stratify_groups(X, y, groups,
                     stratified_categories[interval] = {}
 
                 stratified_categories[interval][group] = j
-                # ipdb.set_trace()
-    # now we have categories where, for each interval, there is a dict of groups.
+
     return stratified_categories
 
 def multicalibration_loss(

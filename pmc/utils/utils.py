@@ -46,12 +46,11 @@ def categorize(X, y, groups, grouping,
 
     categories = None 
 
+    # match sklearn.calibration_curve:
+    # bins = np.linspace(0.0, 1.0 + 1e-8, n_bins + 1)
+    # https://github.com/scikit-learn/scikit-learn/blob/baf828ca1/sklearn/calibration.py#L869
     if bins is None:
-        if bin_scaling == 'log':
-            bins = np.geomspace(float(1.0/n_bins), 1.0, n_bins)
-        else:
-            bins = np.linspace(float(1.0/n_bins), 1.0, n_bins)
-        bins[0] = 0.0
+        bins = make_bins(n_bins, bin_scaling)
     else:
         n_bins=len(bins)
 
@@ -84,3 +83,9 @@ def categorize(X, y, groups, grouping,
                 categories[group + (interval,)] = j
     return categories
 
+def make_bins(n_bins: int, bin_scaling='linear'):
+    """Makes bins."""
+    if bin_scaling == 'log':
+        return np.geomspace(0.0, 1.0+1e-8, n_bins+1)
+    else:
+        return np.linspace(0.0, 1.0+1e-8, n_bins+1)

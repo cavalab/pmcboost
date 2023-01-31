@@ -7,8 +7,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import roc_auc_score, average_precision_score
 from pmlb import pmlb   
-import pmc.utils as utils
-import pmc.metrics as metrics
+from pmc.metrics import (
+    proportional_multicalibration_loss,
+    multicalibration_loss
+)
 
 dataset = pmlb.fetch_data('adult', 
                           local_cache_dir='/home/bill/projects/pmlb'
@@ -59,7 +61,7 @@ def test_training(metric,grouping):
 
     est = MultiCalibrator(**params, metric=metric)
 
-    est.fit(Xval,yval)
+    est.fit(Xtrain,ytrain)
 
 
     print('model\tfold\tAUROC\tAUPRC\tMC\tPMC')
@@ -71,7 +73,7 @@ def test_training(metric,grouping):
         print(fold,end='\t')
         for score in [roc_auc_score, average_precision_score]: 
             print(f'{score(y_true, y_pred):.3f}',end='\t')
-        mc = metrics.multicalibration_loss(
+        mc = multicalibration_loss(
             est,
             x, 
             y_true, 
@@ -82,7 +84,7 @@ def test_training(metric,grouping):
             n_bins=params['n_bins'],
             rho=params['rho']
         )
-        pmc = metrics.proportional_multicalibration_loss(
+        pmc = proportional_multicalibration_loss(
             est,
             x, 
             y_true, 

@@ -16,9 +16,10 @@ from sklearn.metrics import mean_squared_error as mse
 from sklearn.metrics import r2_score
 from copy import copy
 import pmc.utils as utils
-import logging
 from pmc.metrics import (multicalibration_score,
                      proportional_multicalibration_score)
+import logging
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 class MultiCalibrator(ClassifierMixin, BaseEstimator):
@@ -109,11 +110,14 @@ class MultiCalibrator(ClassifierMixin, BaseEstimator):
         self : object
             Returns self.
         """
-        logger.setLevel({0:logging.WARN, 
-                         1:logging.INFO, 
-                         2:logging.DEBUG}
-                        [self.verbosity]
-                       )
+        logger = logging.getLogger(__name__)
+        logger.setLevel({
+            0:logging.WARN, 
+            1:logging.INFO, 
+            2:logging.DEBUG
+            }
+            [self.verbosity]
+        )
 
         # Check that X and y have correct shape
         # X, y = check_X_y(X, y)
@@ -166,14 +170,6 @@ class MultiCalibrator(ClassifierMixin, BaseEstimator):
         y_init = pd.Series(y_init, index=self.X_.index)
         y_adjusted = copy(y_init)
         MSE = mse(self.y_, y_init)
-        log = dict(
-            iteration=[],
-            r=[],
-            ybar=[],
-            delta=[],
-            alpha=[],
-            category=[] 
-        )
 
         ######################################## 
         # initialize categories and loss metric
@@ -199,14 +195,20 @@ class MultiCalibrator(ClassifierMixin, BaseEstimator):
             MSE = mse(ys, ys_pred)
             cal_loss, p_worst_c, p_worst_idx, cats =  \
                     self.auditor_.loss(ys, ys_pred, Xs, return_cat=True)
+            other_metric = 'PMC' if self.metric=='MC' else 'MC'
+            stats = {
+                'iteration':i,
+                '# categories': len(categories),
+                'smallest category': smallest_cat,
+                '# updates': n_updates,
+                self.metric: cal_loss, 
+                'MSE': MSE,
+                other_metric: self.auditor_.loss(ys, ys_pred, Xs, metric=other_metric)[0],
+                'worst category':p_worst_c,
+            }
+            self.update_stats(stats)
 
-            logger.info(
-                        f'# categories:{len(categories)}, '
-                        f'smallest cat: {smallest_cat},'
-                        f'# updates:{n_updates}, '
-                        f'{self.metric}:{cal_loss:.3f}, '
-                        f'MSE:{MSE:.3f} '
-            )
+            logger.info(', '.join([ f'{k}: {v:.3f}' if isinstance(v,float) else f'{k}: {v}' for k,v in stats.items() ]))
             # make an iterable over groups, intervals
             categories = self.auditor_.categorize(Xs, ys_pred)
             if self.iter_sample == None:
@@ -338,9 +340,20 @@ class MultiCalibrator(ClassifierMixin, BaseEstimator):
         logger.info(f'final multicalibration: {final_MC:.3f}')
         logger.info(f'initial proportional multicalibration: {init_PMC:.3f}')
         logger.info(f'final proportional multicalibration: {final_PMC:.3f}')
+        self.stats_ = pd.DataFrame(self.stats_)
+        self.n_updates_ = n_updates
         # Return the classifier
         return self
-    
+
+    def update_stats(self, stats):
+        if not hasattr(self, 'stats_'):
+            # self.stats_ = pd.DataFrame()
+            self.stats_ = [stats]
+        else:
+            self.stats_.append(stats)
+            # self.stats_ = pd.concat([self.stats_,
+            #     pd.DataFrame(stats, index=[stats['iteration']])
+            # ])
 
     def predict_proba(self, X):
         """ A reference implementation of a prediction for a classifier.

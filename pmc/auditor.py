@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import logging
-import pmc.metrics.categorize
+from pmc.utils import categorize
 logger = logging.getLogger(__name__)
 
 class Auditor():
@@ -44,7 +44,7 @@ class Auditor():
                  alpha=0.01,
                  n_bins=10,
                  bins=None,
-                 bin_spacing='linear',
+                 bin_scaling='linear',
                  gamma=0.1,
                  rho=0.1,
                  metric=None,
@@ -55,6 +55,7 @@ class Auditor():
         self.groups = groups
         self.alpha=alpha
         self.n_bins=n_bins
+        self.bin_scaling=bin_scaling
         self.bins=bins
         self.gamma=gamma
         self.rho=rho
@@ -67,13 +68,13 @@ class Auditor():
         """Map data to an existing set of categories."""
 
         # return categories
-        return pmc.metrics.categorize(X, y, 
-                             self.groups, 
-                             self.grouping,
-                             bins=self.bins_,
-                             alpha=self.alpha,
-                             gamma=self.gamma,
-                            )
+        return categorize(X, y, 
+            self.groups, 
+            self.grouping,
+            bins=self.bins_,
+            alpha=self.alpha,
+            gamma=self.gamma,
+        )
 
 
     def make_categories(self, X, y):

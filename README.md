@@ -42,6 +42,8 @@ Type `help(pmc.MultiCalibrator)` in Python to see additional parameters, or look
 
 # Related Work
 
+- La Cava, W., Lett, E., & Wan, G. (2022). Proportional Multicalibration. https://doi.org/10.48550/arXiv.2209.14613
+
 - Hébert-Johnson, Ú., Kim, M. P., Reingold, O., & Rothblum, G. N. (2018). Calibration for the (Computationally-Identifiable) Masses. ArXiv:1711.08513 [Cs, Stat]. http://arxiv.org/abs/1711.08513
 
 - Foulds, J., Islam, R., Keya, K. N., & Pan, S. (2019). An Intersectional Definition of Fairness. ArXiv:1807.08362 [Cs, Stat]. http://arxiv.org/abs/1807.08362

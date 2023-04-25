@@ -61,15 +61,21 @@ def categorize(X, y, groups, grouping,
                                            retbins=True
                                           )
     categories = {}
+    group_ids = {}
+    # marginal groups
+    for g in groups:
+        grp = df.groupby(g).groups
+        for k,v in grp.items():
+            group_ids[(g,k)] = v
+    # intersectional groups
     if grouping=='intersectional':
-        group_ids = df.groupby(groups).groups
-    elif grouping=='marginal':
-        group_ids = df[groups].groupby(groups).groups
-        group_ids = {}
-        for g in groups:
-            grp = df.groupby(g).groups
-            for k,v in grp.items():
-                group_ids[(g,k)] = v
+        inter_group_ids={}
+        for group_vals,dfg in df.groupby(groups):
+            key = []
+            for grp,val in zip(groups,group_vals):
+                key.append((grp,val))
+            inter_group_ids[tuple(key)] = dfg.index
+        group_ids.update(inter_group_ids)
 
     min_grp_size = gamma*len(X) 
     min_cat_size = min_grp_size*alpha/n_bins

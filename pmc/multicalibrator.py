@@ -118,7 +118,9 @@ class MultiCalibrator(ClassifierMixin, BaseEstimator):
             }
             [self.verbosity]
         )
-
+        # clear statistics from previous calls to fit
+        if hasattr(self, 'stats_'):
+            del self.stats_
         # Check that X and y have correct shape
         # X, y = check_X_y(X, y)
         # Store the classes seen during fit

@@ -7,10 +7,17 @@ PMCBoost supports both Multicalibration (Hébert-Johnson et al 2018) and Proport
 "Proportional" multicalibration extends multicalibration by controlling both the *absolute* calibration error in each (group,bin) category, as well as the *proportion* of calibration error relative to the true (group,bin) risk. 
 This makes it control both multicalibration and *differential calibration* (Foulds et al 2019) simultaneously. 
 
-The following preprint describes PMC in more detail: 
+# Cite 
 
-La Cava, W., Lett, E., & Wan, G. (2022). Proportional Multicalibration. https://doi.org/10.48550/arXiv.2209.14613
+The following paper describes PMC in more detail: 
 
+
+La Cava, W., Lett, E., and Wan, G. (2023).
+Fair admission risk prediction with proportional multicalibration.
+*Conference on Health, Inference, and Learning.*
+(Best Paper Award!)
+[PMLR](https://proceedings.mlr.press/v209/la-cava23a.html)  |  [arXiv](https://doi.org/10.48550/arXiv.2209.14613)  |  [experiments](https://github.com/cavalab/proportional-multicalibration) 
+ 
 # Installation 
 ```
 pip install git+https://github.com/cavalab/pmcboost
